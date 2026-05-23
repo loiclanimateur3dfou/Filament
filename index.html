@@ -275,7 +275,7 @@
 
 <!-- MODAL -->
 <div class="overlay hidden" id="overlay" onclick="handleOverlayClick(event)">
-  <div class="modal" id="modal">
+  <div class="modal" id="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modalTitle">➕ Nouvelle bobine</div>
 
@@ -474,6 +474,7 @@ function openModal(id) {
 
 function closeModal() {
   document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('modal').scrollTop = 0;
   editingId = null;
 }
 
