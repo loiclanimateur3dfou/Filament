@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Filaments" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <title>🧵 Filaments</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d14;
+      --surface: #1a1a26;
+      --surface2: #22223a;
+      --border: #2e2e48;
+      --text: #f0f0ff;
+      --muted: #8888aa;
+      --green: #4ade80;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --accent: #7c6af7;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(160deg, #1a1a2e, #0d0d20);
+      border-bottom: 1px solid var(--border);
+      padding: env(safe-area-inset-top, 0) 20px 0;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-inner {
+      padding: 16px 0 14px;
+    }
+    .header-label {
+      font-size: 10px; color: var(--accent); letter-spacing: 3px; margin-bottom: 2px;
+    }
+    .header-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px; font-weight: 800; letter-spacing: 1px;
+    }
+    .stats-row {
+      display: flex; gap: 10px; margin-top: 14px; padding-bottom: 16px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .stats-row::-webkit-scrollbar { display: none; }
+    .stat-chip {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 8px 14px; text-align: center; flex-shrink: 0;
+    }
+    .stat-num { font-size: 18px; font-weight: 700; }
+    .stat-lbl { font-size: 9px; color: var(--muted); letter-spacing: 2px; margin-top: 1px; }
+
+    /* FILTERS */
+    .filters {
+      display: flex; gap: 8px; padding: 14px 20px 10px; overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--muted); font-family: 'Space Mono', monospace;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
+    }
+    .filter-btn.active {
+      border-color: var(--accent); background: #7c6af722; color: var(--accent);
+    }
+
+    /* ADD BUTTON */
+    .add-fab {
+      position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0));
+      right: 20px; z-index: 20;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--accent); border: none; color: #fff;
+      font-size: 26px; cursor: pointer;
+      box-shadow: 0 4px 24px #7c6af766;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .add-fab:active { transform: scale(0.93); box-shadow: 0 2px 12px #7c6af766; }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px; padding: 10px 20px 100px;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--surface); border-radius: 14px;
+      padding: 14px; display: flex; flex-direction: column; gap: 10;
+      border: 1.5px solid transparent;
+      transition: transform 0.15s;
+      cursor: pointer;
+    }
+    .card:active { transform: scale(0.97); }
+    .card-dot {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      margin-bottom: 2px;
+      box-shadow: 0 0 16px var(--dot-color, #888);
+    }
+    .card-name { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .card-sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px;
+      font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    }
+    .badge-new { background: #22c55e22; color: var(--green); border: 1px solid var(--green); }
+    .badge-used { background: #f59e0b22; color: var(--yellow); border: 1px solid var(--yellow); }
+    .progress-track {
+      background: var(--surface2); border-radius: 4px; height: 5px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 4px; transition: width 0.4s ease;
+    }
+
+    /* EMPTY */
+    .empty {
+      grid-column: 1/-1; text-align: center; padding: 60px 20px;
+      border: 1px dashed var(--border); border-radius: 16px; color: var(--muted);
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-text { font-size: 13px; }
+
+    /* MODAL OVERLAY */
+    .overlay {
+      position: fixed; inset: 0; background: #000b; z-index: 50;
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 0;
+    }
+    .modal {
+      background: var(--surface);
+      border-radius: 20px 20px 0 0;
+      border-top: 1px solid var(--border);
+      padding: 0 20px calc(20px + env(safe-area-inset-bottom, 0));
+      width: 100%; max-width: 540px;
+      max-height: 92dvh; overflow-y: auto;
+      animation: slideUp 0.25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-handle {
+      width: 40px; height: 4px; background: var(--border);
+      border-radius: 2px; margin: 12px auto 20px;
+    }
+    .modal-title {
+      font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+      margin-bottom: 20px;
+    }
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 10px; color: var(--muted);
+      letter-spacing: 2px; margin-bottom: 6px;
+    }
+    .field input, .field select {
+      width: 100%; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); font-family: 'Space Mono', monospace;
+      font-size: 14px; outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--accent); }
+
+    .quick-colors {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+    }
+    .qc {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid transparent; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .qc.selected { border-color: #fff; transform: scale(1.2); }
+
+    .color-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .color-row input[type=color] {
+      width: 42px; height: 38px; border-radius: 8px; border: 1px solid var(--border);
+      background: none; cursor: pointer; padding: 2px; flex-shrink: 0;
+    }
+    .color-preview {
+      width: 38px; height: 38px; border-radius: 8px;
+      border: 1px solid var(--border); flex-shrink: 0;
+    }
+
+    .toggle-row { display: flex; gap: 10px; }
+    .toggle-btn {
+      flex: 1; padding: 10px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--muted); font-family: 'Space Mono', monospace;
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+      text-align: center;
+    }
+    .toggle-btn.active {
+      border-color: var(--green); background: #22c55e22; color: var(--green);
+    }
+
+    .range-wrap { position: relative; }
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 24px; }
+    .btn {
+      flex: 1; padding: 13px; border-radius: 12px;
+      font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700;
+      cursor: pointer; border: none; transition: all 0.15s;
+    }
+    .btn-cancel {
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-save {
+      flex: 2; background: var(--accent); color: #fff;
+    }
+    .btn-save:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .btn-delete {
+      background: #3a1a1a; color: var(--red); border: 1px solid #5a2a2a;
+    }
+
+    .install-banner {
+      margin: 12px 20px 0;
+      background: #7c6af722; border: 1px solid var(--accent);
+      border-radius: 12px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10; font-size: 12px;
+    }
+    .install-banner.hidden { display: none; }
+    .install-close {
+      margin-left: auto; background: none; border: none;
+      color: var(--muted); cursor: pointer; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-label">ATELIER 3D</div>
+    <div class="header-title">🧵 FILAMENTS</div>
+    <div class="stats-row" id="statsRow"></div>
+  </div>
+</div>
+
+<div id="installBanner" class="install-banner hidden">
+  <span>📱 Installe l'app : menu du navigateur → <strong>Ajouter à l'écran d'accueil</strong></span>
+  <button class="install-close" onclick="document.getElementById('installBanner').classList.add('hidden')">✕</button>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-filter="tout" onclick="setFilter('tout', this)">Toutes</button>
+  <button class="filter-btn" data-filter="neuve" onclick="setFilter('neuve', this)">✨ Neuves</button>
+  <button class="filter-btn" data-filter="utilisée" onclick="setFilter('utilisée', this)">🔄 Utilisées</button>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<button class="add-fab" onclick="openModal(null)">＋</button>
+
+<!-- MODAL -->
+<div class="overlay hidden" id="overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">➕ Nouvelle bobine</div>
+
+    <div class="field">
+      <label>NOM DE LA COULEUR</label>
+      <input id="fColor" type="text" placeholder="ex: Bleu cobalt, Vert forêt..." />
+    </div>
+
+    <div class="field">
+      <label>COULEUR VISUELLE</label>
+      <div class="quick-colors" id="quickColors"></div>
+      <div class="color-row">
+        <input type="color" id="fColorPicker" value="#888888" oninput="onPickerChange(this.value)" />
+        <input type="text" id="fColorHex" placeholder="#RRGGBB" oninput="onHexInput(this.value)"
+          style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-family:monospace; font-size:13px; outline:none;" />
+        <div class="color-preview" id="colorPreview"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>MARQUE</label>
+      <input id="fBrand" type="text" placeholder="ex: Bambu Lab, Polymaker, eSUN..." />
+    </div>
+
+    <div class="field">
+      <label>TYPE</label>
+      <select id="fType">
+        <option>PLA</option><option>PLA+</option><option>PETG</option>
+        <option>ABS</option><option>TPU</option><option>ASA</option>
+        <option>PA</option><option>Autre</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>ÉTAT</label>
+      <div class="toggle-row">
+        <button class="toggle-btn active" id="btnNeuve" onclick="setStatus('neuve')">✨ Neuve</button>
+        <button class="toggle-btn" id="btnUsed" onclick="setStatus('utilisée')">🔄 Utilisée</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>RESTANT : <span id="remainingVal">100</span>%</label>
+      <input type="range" id="fRemaining" min="0" max="100" value="100"
+        oninput="document.getElementById('remainingVal').textContent = this.value" />
+    </div>
+
+    <div class="field">
+      <label>NOTES (optionnel)</label>
+      <input id="fNotes" type="text" placeholder="ex: utilisé pour les prototypes..." />
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-delete hidden" id="btnDelete" onclick="deleteSpool()">🗑️</button>
+      <button class="btn btn-save" id="btnSave" onclick="saveSpool()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUICK = [
+  "#F5F5F5","#D0D0D0","#1a1a1a","#E53935","#FF7043","#FB8C00",
+  "#FDD835","#C6E000","#43A047","#00897B","#00ACC1","#1E88E5",
+  "#3949AB","#8E24AA","#E91E63","#F06292","#6D4C41","#FFD600",
+  "#B0BEC5","#80CBC4","#FFCC80","#CE93D8","#90CAF9","#A5D6A7",
+  "#FF8A65","#4DB6AC","#7986CB","#F48FB1","#FFF176","#BCAAA4",
+];
+
+let spools = JSON.parse(localStorage.getItem('filaments-v1') || '[]');
+let currentFilter = 'tout';
+let editingId = null;
+let currentHex = '#888888';
+let currentStatus = 'neuve';
+
+function save() {
+  localStorage.setItem('filaments-v1', JSON.stringify(spools));
+}
+
+function renderStats() {
+  const total = spools.length;
+  const neuves = spools.filter(s => s.status === 'neuve').length;
+  const used = spools.filter(s => s.status === 'utilisée').length;
+  const low = spools.filter(s => s.remaining < 25).length;
+  document.getElementById('statsRow').innerHTML = [
+    { label: 'TOTAL', val: total, color: '#c0c0f0' },
+    { label: 'NEUVES', val: neuves, color: '#4ade80' },
+    { label: 'UTILISÉES', val: used, color: '#fbbf24' },
+    { label: 'STOCK BAS', val: low, color: '#f87171' },
+  ].map(s => `
+    <div class="stat-chip">
+      <div class="stat-num" style="color:${s.color}">${s.val}</div>
+      <div class="stat-lbl">${s.label}</div>
+    </div>
+  `).join('');
+}
+
+function renderGrid() {
+  const filtered = currentFilter === 'tout' ? spools
+    : spools.filter(s => s.status === currentFilter);
+  const grid = document.getElementById('grid');
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🧵</div><div class="empty-text">Aucune bobine<br>Appuie sur + pour commencer</div></div>`;
+    return;
+  }
+  grid.innerHTML = filtered.map(s => {
+    const pct = s.remaining || 0;
+    const barColor = pct > 60 ? '#4ade80' : pct > 30 ? '#fbbf24' : '#f87171';
+    const hex = s.colorHex || '#888';
+    return `
+      <div class="card" style="border-color:${hex}55" onclick="openModal('${s.id}')">
+        <div class="card-dot" style="background:${hex}; --dot-color:${hex}"></div>
+        <div class="card-name">${s.color || '—'}</div>
+        <div class="card-sub">${s.brand || 'Marque ?'} · ${s.type}</div>
+        <span class="badge ${s.status === 'neuve' ? 'badge-new' : 'badge-used'}">${s.status === 'neuve' ? 'NEUVE' : 'UTILISÉE'}</span>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div style="font-size:10px;color:#888;text-align:right">${pct}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function render() { renderStats(); renderGrid(); }
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+// Modal
+function buildQuickColors() {
+  document.getElementById('quickColors').innerHTML = QUICK.map(c => `
+    <div class="qc" style="background:${c}" data-hex="${c}" onclick="selectQuick('${c}')"></div>
+  `).join('');
+}
+
+function selectQuick(hex) {
+  currentHex = hex;
+  document.getElementById('fColorPicker').value = hex;
+  document.getElementById('fColorHex').value = hex;
+  document.getElementById('colorPreview').style.background = hex;
+  document.querySelectorAll('.qc').forEach(el => {
+    el.classList.toggle('selected', el.dataset.hex === hex);
+  });
+}
+
+function onPickerChange(val) {
+  currentHex = val;
+  document.getElementById('fColorHex').value = val;
+  document.getElementById('colorPreview').style.background = val;
+  document.querySelectorAll('.qc').forEach(el => el.classList.remove('selected'));
+}
+
+function onHexInput(val) {
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    currentHex = val;
+    document.getElementById('fColorPicker').value = val;
+    document.getElementById('colorPreview').style.background = val;
+  }
+}
+
+function setStatus(s) {
+  currentStatus = s;
+  document.getElementById('btnNeuve').classList.toggle('active', s === 'neuve');
+  document.getElementById('btnUsed').classList.toggle('active', s === 'utilisée');
+}
+
+function openModal(id) {
+  editingId = id;
+  buildQuickColors();
+  const spool = id ? spools.find(s => s.id === id) : null;
+
+  document.getElementById('modalTitle').textContent = spool ? '✏️ Modifier' : '➕ Nouvelle bobine';
+  document.getElementById('fColor').value = spool?.color || '';
+  document.getElementById('fBrand').value = spool?.brand || '';
+  document.getElementById('fType').value = spool?.type || 'PLA';
+  document.getElementById('fNotes').value = spool?.notes || '';
+  document.getElementById('fRemaining').value = spool?.remaining ?? 100;
+  document.getElementById('remainingVal').textContent = spool?.remaining ?? 100;
+  document.getElementById('btnDelete').classList.toggle('hidden', !spool);
+  document.getElementById('btnSave').textContent = spool ? '💾 Sauvegarder' : 'Ajouter';
+
+  const hex = spool?.colorHex || '#888888';
+  selectQuick(QUICK.includes(hex) ? hex : hex);
+  onPickerChange(hex);
+  document.getElementById('fColorPicker').value = hex;
+  document.getElementById('fColorHex').value = hex;
+
+  setStatus(spool?.status || 'neuve');
+  document.getElementById('overlay').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.add('hidden');
+  editingId = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+function saveSpool() {
+  const color = document.getElementById('fColor').value.trim();
+  if (!color) { document.getElementById('fColor').focus(); return; }
+  const data = {
+    id: editingId || String(Date.now()),
+    color,
+    colorHex: currentHex,
+    brand: document.getElementById('fBrand').value.trim(),
+    type: document.getElementById('fType').value,
+    status: currentStatus,
+    remaining: Number(document.getElementById('fRemaining').value),
+    notes: document.getElementById('fNotes').value.trim(),
+  };
+  if (editingId) {
+    spools = spools.map(s => s.id === editingId ? data : s);
+  } else {
+    spools.push(data);
+  }
+  save(); closeModal(); render();
+}
+
+function deleteSpool() {
+  if (!confirm('Supprimer cette bobine ?')) return;
+  spools = spools.filter(s => s.id !== editingId);
+  save(); closeModal(); render();
+}
+
+// Install banner
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if ((isIOS || /android/i.test(navigator.userAgent)) && !isStandalone) {
+  document.getElementById('installBanner').classList.remove('hidden');
+}
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+render();
+</script>
+</body>
+</html>
