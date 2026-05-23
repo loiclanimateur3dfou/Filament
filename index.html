@@ -274,8 +274,8 @@
 <button class="add-fab" onclick="openModal(null)">＋</button>
 
 <!-- MODAL -->
-<div class="overlay hidden" id="overlay" onclick="handleOverlayClick(event)">
-  <div class="modal" id="modal" onclick="event.stopPropagation()">
+<div class="overlay hidden" id="overlay" onclick="closeModal()" ontouchend="closeModal()">
+  <div class="modal" id="modal" onclick="event.stopPropagation()" ontouchend="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modalTitle">➕ Nouvelle bobine</div>
 
@@ -329,7 +329,7 @@
     </div>
 
     <div class="btn-row">
-      <button class="btn btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-cancel" onclick="closeModal()" ontouchend="closeModal()">Annuler</button>
       <button class="btn btn-delete hidden" id="btnDelete" onclick="deleteSpool()">🗑️</button>
       <button class="btn btn-save" id="btnSave" onclick="saveSpool()">Ajouter</button>
     </div>
