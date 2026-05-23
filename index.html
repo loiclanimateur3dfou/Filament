@@ -114,6 +114,8 @@
       </div>
     </div>
 
+    </div>
+
     <div class="field">
       <label>MARQUE</label>
       <input id="fBrand" type="text" placeholder="ex: Bambu Lab, Polymaker..." />
@@ -139,6 +141,11 @@
     <div class="field">
       <label>RESTANT : <span id="remainingVal">100</span>%</label>
       <input type="range" id="fRemaining" min="0" max="100" value="100" />
+    </div>
+
+    <div class="field" id="qtyField">
+      <label>QUANTITÉ (bobines identiques)</label>
+      <input id="fQty" type="number" min="1" max="20" value="1" />
     </div>
 
     <div class="field">
@@ -231,6 +238,8 @@ function openModal(id) {
   document.getElementById('fBrand').value = spool?.brand || '';
   document.getElementById('fType').value = spool?.type || 'PLA';
   document.getElementById('fNotes').value = spool?.notes || '';
+  document.getElementById('fQty').value = 1;
+  document.getElementById('qtyField').style.display = spool ? 'none' : 'block';
   document.getElementById('fRemaining').value = spool?.remaining ?? 100;
   document.getElementById('remainingVal').textContent = spool?.remaining ?? 100;
   document.getElementById('btnDelete').classList.toggle('hidden', !spool);
@@ -249,8 +258,8 @@ function closeModal() {
 function saveSpool() {
   const color = document.getElementById('fColor').value.trim();
   if (!color) { document.getElementById('fColor').focus(); return; }
-  const data = {
-    id: editingId || String(Date.now()),
+  const qty = editingId ? 1 : Math.max(1, parseInt(document.getElementById('fQty').value) || 1);
+  const baseData = {
     color,
     colorHex: currentHex,
     brand: document.getElementById('fBrand').value.trim(),
@@ -260,9 +269,11 @@ function saveSpool() {
     notes: document.getElementById('fNotes').value.trim(),
   };
   if (editingId) {
-    spools = spools.map(s => s.id === editingId ? data : s);
+    spools = spools.map(s => s.id === editingId ? {...baseData, id: editingId} : s);
   } else {
-    spools.push(data);
+    for (let i = 0; i < qty; i++) {
+      spools.push({...baseData, id: String(Date.now()) + i});
+    }
   }
   save(); closeModal(); render();
 }
