@@ -13,37 +13,18 @@
   <title>🧵 Filaments</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0d0d14;
-      --surface: #1a1a26;
-      --surface2: #22223a;
-      --border: #2e2e48;
-      --text: #f0f0ff;
-      --muted: #8888aa;
-      --green: #4ade80;
-      --yellow: #fbbf24;
-      --red: #f87171;
-      --accent: #7c6af7;
+      --bg: #0d0d14; --surface: #1a1a26; --surface2: #22223a;
+      --border: #2e2e48; --text: #f0f0ff; --muted: #8888aa;
+      --green: #4ade80; --yellow: #fbbf24; --red: #f87171; --accent: #7c6af7;
     }
-
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      overflow-x: hidden;
-    }
+    html, body { background: var(--bg); color: var(--text); font-family: 'Space Mono', monospace; overflow-x: hidden; }
 
     /* HEADER */
-    .header {
-      background: linear-gradient(160deg, #1a1a2e, #0d0d20);
-      border-bottom: 1px solid var(--border);
-      padding: env(safe-area-inset-top, 12px) 20px 0;
-      position: sticky; top: 0; z-index: 10;
-    }
+    .header { background: linear-gradient(160deg,#1a1a2e,#0d0d20); border-bottom: 1px solid var(--border); padding: env(safe-area-inset-top,12px) 20px 0; position: sticky; top: 0; z-index: 10; }
     .header-inner { padding: 14px 0 0; }
     .header-label { font-size: 10px; color: var(--accent); letter-spacing: 3px; }
-    .header-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-top: 2px; }
+    .header-title { font-family: 'Syne',sans-serif; font-size: 22px; font-weight: 800; margin-top: 2px; }
     .stats-row { display: flex; gap: 10px; margin-top: 12px; padding-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
     .stats-row::-webkit-scrollbar { display: none; }
     .stat-chip { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 7px 14px; text-align: center; flex-shrink: 0; }
@@ -53,17 +34,11 @@
     /* FILTERS */
     .filters { display: flex; gap: 8px; padding: 12px 20px 8px; overflow-x: auto; scrollbar-width: none; }
     .filters::-webkit-scrollbar { display: none; }
-    .filter-btn {
-      padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
-      background: var(--surface); color: var(--muted);
-      font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-      white-space: nowrap; flex-shrink: 0;
-    }
+    .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: 'Space Mono',monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
     .filter-btn.active { border-color: var(--accent); background: #7c6af722; color: var(--accent); }
 
     /* GRID */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; padding: 8px 20px 100px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(155px,1fr)); gap: 12px; padding: 8px 20px 100px; }
     .card { background: var(--surface); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; border: 1.5px solid var(--border); cursor: pointer; transition: transform 0.1s; }
     .card:active { transform: scale(0.97); }
     .card-dot { width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.12); }
@@ -78,107 +53,53 @@
     .empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; border: 1px dashed var(--border); border-radius: 16px; color: var(--muted); }
     .empty-icon { font-size: 40px; margin-bottom: 10px; }
 
-    /* FAB */
-    .fab {
-      position: fixed;
-      bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-      right: 20px; z-index: 20;
-      width: 56px; height: 56px; border-radius: 50%;
-      background: var(--accent); border: none; color: #fff;
-      font-size: 30px; cursor: pointer;
-      box-shadow: 0 4px 20px #7c6af766;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* MODAL OVERLAY — fixed, full screen, flex column */
-    .overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      background: rgba(0,0,0,0.65);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.2s, visibility 0.2s;
-    }
-    .overlay.open {
-      visibility: visible;
-      opacity: 1;
-    }
-
-    /* MODAL SHEET — fixed height, scrollable internally */
-    .modal-sheet {
-      background: var(--surface);
-      border-radius: 20px 20px 0 0;
-      border-top: 1px solid var(--border);
-      width: 100%;
-      max-width: 540px;
-      margin: 0 auto;
-      max-height: 85vh;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 0 20px calc(20px + env(safe-area-inset-bottom, 0px));
-      transform: translateY(100%);
-      transition: transform 0.25s ease;
-    }
-    .overlay.open .modal-sheet {
-      transform: translateY(0);
-    }
-
-    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 14px auto 20px; }
-    .modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 22px; }
-
-    /* FORM */
-    .field { margin-bottom: 18px; }
-    .field label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 7px; }
-    .field input[type=text],
-    .field input[type=number],
-    .field select {
-      width: 100%; padding: 12px 14px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--surface2);
-      color: var(--text); font-family: 'Space Mono', monospace;
-      font-size: 14px; outline: none; -webkit-appearance: none;
-    }
-    .field input:focus, .field select:focus { border-color: var(--accent); }
-
-    .quick-colors { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    .qc { width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid transparent; cursor: pointer; flex-shrink: 0; transition: transform 0.1s; }
-    .qc.selected { border-color: #fff; transform: scale(1.2); }
-
-    .color-row { display: flex; align-items: center; gap: 10px; }
-    .color-row input[type=color] { width: 46px; height: 42px; border-radius: 8px; border: 1px solid var(--border); background: none; cursor: pointer; padding: 3px; flex-shrink: 0; }
-    .color-hex { flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: monospace; font-size: 13px; outline: none; }
-    .color-preview { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); flex-shrink: 0; }
-
-    .toggle-row { display: flex; gap: 10px; }
-    .toggle-btn { flex: 1; padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; text-align: center; }
-    .toggle-btn.active { border-color: var(--green); background: #22c55e22; color: var(--green); }
-
-    input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; }
-
-    .btn-row { display: flex; gap: 10px; margin-top: 28px; }
-    .btn { flex: 1; padding: 15px 10px; border-radius: 12px; font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; cursor: pointer; border: none; text-align: center; }
-    .btn-cancel { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-    .btn-save { flex: 2; background: var(--accent); color: #fff; }
-    .btn-delete { background: #3a1a1a; color: var(--red); border: 1px solid #5a2a2a; }
-    .hidden { display: none !important; }
-
     /* SHOPPING VIEW */
     .shop-view { padding: 12px 20px 100px; display: none; }
     .shop-view.active { display: block; }
-    .shop-title { font-family: "Syne", sans-serif; font-size: 14px; font-weight: 800; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; margin-top: 16px; }
+    .shop-section-title { font-family: 'Syne',sans-serif; font-size: 13px; font-weight: 800; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin: 16px 0 10px; }
     .shop-card { background: var(--surface); border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; border: 1.5px solid var(--border); }
     .shop-dot { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.1); }
-    .shop-info { flex: 1; }
-    .shop-name { font-size: 14px; font-weight: 700; }
+    .shop-info { flex: 1; min-width: 0; }
+    .shop-name { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .shop-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .shop-badge { flex-shrink: 0; text-align: right; }
     .shop-qty { font-size: 20px; font-weight: 700; }
     .shop-qty-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
     .shop-empty { text-align: center; padding: 60px 20px; color: var(--muted); }
-    .shop-empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+    /* FAB */
+    .fab { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom,0px)); right: 20px; z-index: 20; width: 56px; height: 56px; border-radius: 50%; background: var(--accent); border: none; color: #fff; font-size: 30px; cursor: pointer; box-shadow: 0 4px 20px #7c6af766; display: flex; align-items: center; justify-content: center; }
+
+    /* MODAL */
+    .overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.65); display: flex; flex-direction: column; justify-content: flex-end; visibility: hidden; opacity: 0; transition: opacity 0.2s, visibility 0.2s; }
+    .overlay.open { visibility: visible; opacity: 1; }
+    .modal-sheet { background: var(--surface); border-radius: 20px 20px 0 0; border-top: 1px solid var(--border); width: 100%; max-width: 540px; margin: 0 auto; max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 20px calc(24px + env(safe-area-inset-bottom,0px)); transform: translateY(100%); transition: transform 0.25s ease; }
+    .overlay.open .modal-sheet { transform: translateY(0); }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 14px auto 20px; }
+    .modal-title { font-family: 'Syne',sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 22px; }
+
+    /* FORM */
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 7px; }
+    .field input[type=text], .field input[type=number], .field select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: 'Space Mono',monospace; font-size: 14px; outline: none; -webkit-appearance: none; }
+    .field input:focus, .field select:focus { border-color: var(--accent); }
+    .quick-colors { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .qc { width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid transparent; cursor: pointer; flex-shrink: 0; transition: transform 0.1s; }
+    .qc.selected { border-color: #fff; transform: scale(1.2); }
+    .color-row { display: flex; align-items: center; gap: 10px; }
+    .color-row input[type=color] { width: 46px; height: 42px; border-radius: 8px; border: 1px solid var(--border); background: none; cursor: pointer; padding: 3px; flex-shrink: 0; }
+    .color-hex { flex: 1; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-family: monospace; font-size: 13px; outline: none; }
+    .color-preview { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); flex-shrink: 0; }
+    .toggle-row { display: flex; gap: 10px; }
+    .toggle-btn { flex: 1; padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-family: 'Space Mono',monospace; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; text-align: center; }
+    .toggle-btn.active { border-color: var(--green); background: #22c55e22; color: var(--green); }
+    input[type=range] { width: 100%; accent-color: var(--accent); height: 28px; }
+    .btn-row { display: flex; gap: 10px; margin-top: 28px; }
+    .btn { flex: 1; padding: 15px 10px; border-radius: 12px; font-family: 'Space Mono',monospace; font-size: 14px; font-weight: 700; cursor: pointer; border: none; text-align: center; }
+    .btn-cancel { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .btn-save { flex: 2; background: var(--accent); color: #fff; }
+    .btn-delete { background: #3a1a1a; color: var(--red); border: 1px solid #5a2a2a; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -199,10 +120,10 @@
 </div>
 
 <div class="grid" id="grid"></div>
+<div class="shop-view" id="shopView"><div id="shopContent"></div></div>
 
 <button class="fab" id="fabBtn">＋</button>
 
-<!-- MODAL -->
 <div class="overlay" id="overlay">
   <div class="modal-sheet" id="modalSheet">
     <div class="modal-handle"></div>
@@ -268,250 +189,245 @@
   </div>
 </div>
 
-<!-- SHOPPING VIEW -->
-<div class="shop-view" id="shopView">
-  <div id="shopContent"></div>
-</div>
-
 <script>
-  const STORAGE_KEY = 'filaments-v3';
-  const QUICK_COLORS = [
-    '#F5F5F5','#D0D0D0','#1a1a1a','#E53935','#FF7043','#FB8C00',
-    '#FDD835','#C6E000','#43A047','#00897B','#00ACC1','#1E88E5',
-    '#3949AB','#8E24AA','#E91E63','#F06292','#6D4C41','#FFD600',
-    '#B0BEC5','#80CBC4','#FFCC80','#CE93D8','#90CAF9','#A5D6A7',
-    '#FF8A65','#4DB6AC','#7986CB','#F48FB1','#FFF176','#BCAAA4',
-  ];
-
-  // Migrate old data from previous versions
-  function loadData() {
-    const v3 = localStorage.getItem('filaments-v3');
-    if (v3) return JSON.parse(v3);
-    const v2 = localStorage.getItem('filaments-v2');
-    if (v2) { localStorage.setItem('filaments-v3', v2); return JSON.parse(v2); }
-    const v1 = localStorage.getItem('filaments-v1');
-    if (v1) { localStorage.setItem('filaments-v3', v1); return JSON.parse(v1); }
-    return [];
-  }
-  let spools = loadData();
-  let filter = 'tout';
-  let editingId = null;
-  let currentHex = '#888888';
-  let currentStatus = 'neuve';
-
-  function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(spools)); }
-
-  function renderStats() {
-    const total = spools.length;
-    const neuves = spools.filter(s => s.status === 'neuve').length;
-    const used = spools.filter(s => s.status === 'utilisée').length;
-    const low = spools.filter(s => s.remaining < 25).length;
-    document.getElementById('statsRow').innerHTML = [
-      { label: 'TOTAL', val: total, color: '#c0c0f0' },
-      { label: 'NEUVES', val: neuves, color: '#4ade80' },
-      { label: 'UTILISÉES', val: used, color: '#fbbf24' },
-      { label: 'STOCK BAS', val: low, color: '#f87171' },
-    ].map(s => `<div class="stat-chip"><div class="stat-num" style="color:${s.color}">${s.val}</div><div class="stat-lbl">${s.label}</div></div>`).join('');
-  }
-
-  function renderGrid() {
-    const list = filter === 'tout' ? spools : spools.filter(s => s.status === filter);
-    const grid = document.getElementById('grid');
-    if (list.length === 0) {
-      grid.innerHTML = '<div class="empty"><div class="empty-icon">🧵</div><div>Aucune bobine<br><small>Appuie sur + pour commencer</small></div></div>';
-      return;
-    }
-    grid.innerHTML = list.map(s => {
-      const pct = s.remaining ?? 100;
-      const bar = pct > 60 ? '#4ade80' : pct > 30 ? '#fbbf24' : '#f87171';
-      const hex = s.colorHex || '#888';
-      return `<div class="card" data-id="${s.id}" style="border-color:${hex}66">
-        <div class="card-dot" style="background:${hex};box-shadow:0 0 12px ${hex}55"></div>
-        <div class="card-name">${s.color || '—'}</div>
-        <div class="card-sub">${s.brand || 'Marque ?'} · ${s.type}</div>
-        <span class="badge ${s.status === 'neuve' ? 'badge-new' : 'badge-used'}">${s.status === 'neuve' ? 'NEUVE' : 'UTILISÉE'}</span>
-        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${bar}"></div></div>
-        <div class="pct-label">${pct}%</div>
-      </div>`;
-    }).join('');
-    grid.querySelectorAll('.card').forEach(el => {
-      el.addEventListener('click', () => openModal(el.dataset.id));
-    });
-  }
-
-  function render() { renderStats(); renderGrid(); }
-
-  function renderShop() {
-    const content = document.getElementById('shopContent');
-    // Group by color+type
-    const map = {};
-    spools.forEach(s => {
-      const key = (s.color || '?') + '|' + (s.type || 'PLA') + '|' + (s.colorHex || '#888');
-      if (!map[key]) map[key] = { color: s.color, type: s.type, hex: s.colorHex || '#888', brand: s.brand, neuve: 0, used: 0 };
-      if (s.status === 'neuve') map[key].neuve++;
-      else map[key].used++;
-    });
-
-    const items = Object.values(map);
-    const toRestock = items.filter(i => i.used > 0 && i.neuve === 0);
-    const lowStock = items.filter(i => i.neuve > 0 && i.neuve <= i.used);
-    const ok = items.filter(i => i.neuve > i.used || (i.neuve > 0 && i.used === 0));
-
-    if (items.length === 0) {
-      content.innerHTML = '<div class="shop-empty"><div class="shop-empty-icon">🛒</div><div>Aucune donnée<br><small>Ajoute des bobines d'abord</small></div></div>';
-      return;
-    }
-
-    const makeCard = (i, urgency) => {
-      const borderColor = urgency === 'urgent' ? 'var(--red)' : urgency === 'low' ? 'var(--yellow)' : 'var(--green)';
-      const label = urgency === 'urgent' ? '🔴 À racheter' : urgency === 'low' ? '🟡 Stock faible' : '🟢 OK';
-      return `<div class="shop-card" style="border-color:${borderColor}44">
-        <div class="shop-dot" style="background:${i.hex};box-shadow:0 0 10px ${i.hex}55"></div>
-        <div class="shop-info">
-          <div class="shop-name">${i.color || '—'}</div>
-          <div class="shop-sub">${i.brand || 'Marque ?'} · ${i.type} &nbsp;·&nbsp; ${label}</div>
-        </div>
-        <div class="shop-badge">
-          <div class="shop-qty" style="color:${borderColor}">${i.neuve}</div>
-          <div class="shop-qty-lbl">NEUVES</div>
-        </div>
-      </div>`;
-    };
-
-    let html = '';
-    if (toRestock.length > 0) {
-      html += '<div class="shop-title">🔴 À racheter (' + toRestock.length + ')</div>';
-      html += toRestock.map(i => makeCard(i, 'urgent')).join('');
-    }
-    if (lowStock.length > 0) {
-      html += '<div class="shop-title">🟡 Stock faible (' + lowStock.length + ')</div>';
-      html += lowStock.map(i => makeCard(i, 'low')).join('');
-    }
-    if (ok.length > 0) {
-      html += '<div class="shop-title">🟢 En stock (' + ok.length + ')</div>';
-      html += ok.map(i => makeCard(i, 'ok')).join('');
-    }
-    content.innerHTML = html;
-  }
-
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      filter = btn.dataset.filter;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (filter === 'achats') {
-        document.getElementById('grid').style.display = 'none';
-        document.getElementById('shopView').classList.add('active');
-        renderShop();
-      } else {
-        document.getElementById('grid').style.display = 'grid';
-        document.getElementById('shopView').classList.remove('active');
-        renderGrid();
+// ── STORAGE : essaie toutes les anciennes clés ──
+const KEY = 'filaments-v4';
+function loadData() {
+  for (const k of [KEY, 'filaments-v3', 'filaments-v2', 'filaments-v1']) {
+    try {
+      const raw = localStorage.getItem(k);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (Array.isArray(data) && data.length > 0) {
+          localStorage.setItem(KEY, JSON.stringify(data));
+          return data;
+        }
       }
-    });
+    } catch(e) {}
+  }
+  return [];
+}
+function saveData() { localStorage.setItem(KEY, JSON.stringify(spools)); }
+
+const QUICK = [
+  '#F5F5F5','#D0D0D0','#1a1a1a','#E53935','#FF7043','#FB8C00',
+  '#FDD835','#C6E000','#43A047','#00897B','#00ACC1','#1E88E5',
+  '#3949AB','#8E24AA','#E91E63','#F06292','#6D4C41','#FFD600',
+  '#B0BEC5','#80CBC4','#FFCC80','#CE93D8','#90CAF9','#A5D6A7',
+  '#FF8A65','#4DB6AC','#7986CB','#F48FB1','#FFF176','#BCAAA4',
+];
+
+let spools = loadData();
+let currentFilter = 'tout';
+let editingId = null;
+let currentHex = '#888888';
+let currentStatus = 'neuve';
+
+// ── STATS ──
+function renderStats() {
+  const total = spools.length;
+  const neuves = spools.filter(s => s.status === 'neuve').length;
+  const used = spools.filter(s => s.status === 'utilisée').length;
+  const low = spools.filter(s => s.remaining < 25).length;
+  document.getElementById('statsRow').innerHTML = [
+    {label:'TOTAL', val:total, color:'#c0c0f0'},
+    {label:'NEUVES', val:neuves, color:'#4ade80'},
+    {label:'UTILISÉES', val:used, color:'#fbbf24'},
+    {label:'STOCK BAS', val:low, color:'#f87171'},
+  ].map(s => `<div class="stat-chip"><div class="stat-num" style="color:${s.color}">${s.val}</div><div class="stat-lbl">${s.label}</div></div>`).join('');
+}
+
+// ── GRID ──
+function renderGrid() {
+  const list = currentFilter === 'tout' ? spools : spools.filter(s => s.status === currentFilter);
+  const grid = document.getElementById('grid');
+  if (list.length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🧵</div><div>Aucune bobine<br><small>Appuie sur + pour commencer</small></div></div>';
+    return;
+  }
+  grid.innerHTML = list.map(s => {
+    const pct = s.remaining ?? 100;
+    const bar = pct > 60 ? '#4ade80' : pct > 30 ? '#fbbf24' : '#f87171';
+    const hex = s.colorHex || '#888';
+    return `<div class="card" data-id="${s.id}" style="border-color:${hex}66">
+      <div class="card-dot" style="background:${hex};box-shadow:0 0 12px ${hex}55"></div>
+      <div class="card-name">${s.color || '—'}</div>
+      <div class="card-sub">${s.brand || 'Marque ?'} · ${s.type}</div>
+      <span class="badge ${s.status === 'neuve' ? 'badge-new' : 'badge-used'}">${s.status === 'neuve' ? 'NEUVE' : 'UTILISÉE'}</span>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${bar}"></div></div>
+      <div class="pct-label">${pct}%</div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.card').forEach(el => el.addEventListener('click', () => openModal(el.dataset.id)));
+}
+
+// ── SHOP ──
+function renderShop() {
+  const map = {};
+  spools.forEach(s => {
+    const key = (s.color||'?') + '||' + (s.type||'PLA') + '||' + (s.colorHex||'#888');
+    if (!map[key]) map[key] = {color:s.color, type:s.type, hex:s.colorHex||'#888', brand:s.brand, neuve:0, used:0};
+    s.status === 'neuve' ? map[key].neuve++ : map[key].used++;
   });
 
-  function buildQuickColors() {
-    const container = document.getElementById('quickColors');
-    container.innerHTML = '';
-    QUICK_COLORS.forEach(c => {
-      const el = document.createElement('div');
-      el.className = 'qc';
-      el.style.background = c;
-      el.dataset.hex = c;
-      el.addEventListener('click', () => setHex(c));
-      container.appendChild(el);
-    });
+  const items = Object.values(map);
+  const urgent = items.filter(i => i.used > 0 && i.neuve === 0);
+  const faible = items.filter(i => i.neuve > 0 && i.neuve <= i.used);
+  const ok     = items.filter(i => i.neuve > i.used || (i.neuve > 0 && i.used === 0));
+
+  if (items.length === 0) {
+    document.getElementById('shopContent').innerHTML = '<div class="shop-empty"><div style="font-size:40px;margin-bottom:10px">🛒</div><div>Aucune donnée<br><small>Ajoute des bobines d\'abord</small></div></div>';
+    return;
   }
 
-  function setHex(hex) {
-    currentHex = hex;
-    document.getElementById('fColorPicker').value = hex;
-    document.getElementById('fColorHex').value = hex;
-    document.getElementById('colorPreview').style.background = hex;
-    document.querySelectorAll('.qc').forEach(el => el.classList.toggle('selected', el.dataset.hex === hex));
-  }
+  const card = (i, type) => {
+    const color = type === 'urgent' ? 'var(--red)' : type === 'faible' ? 'var(--yellow)' : 'var(--green)';
+    const label = type === 'urgent' ? '🔴 À racheter' : type === 'faible' ? '🟡 Stock faible' : '🟢 OK';
+    return `<div class="shop-card" style="border-color:${color}55">
+      <div class="shop-dot" style="background:${i.hex};box-shadow:0 0 10px ${i.hex}55"></div>
+      <div class="shop-info">
+        <div class="shop-name">${i.color||'—'}</div>
+        <div class="shop-sub">${i.brand||'?'} · ${i.type} · ${label}</div>
+      </div>
+      <div class="shop-badge">
+        <div class="shop-qty" style="color:${color}">${i.neuve}</div>
+        <div class="shop-qty-lbl">NEUVES</div>
+      </div>
+    </div>`;
+  };
 
-  function setStatus(s) {
-    currentStatus = s;
-    document.getElementById('btnNeuve').classList.toggle('active', s === 'neuve');
-    document.getElementById('btnUsed').classList.toggle('active', s === 'utilisée');
-  }
+  let html = '';
+  if (urgent.length) html += `<div class="shop-section-title">🔴 À racheter (${urgent.length})</div>` + urgent.map(i => card(i,'urgent')).join('');
+  if (faible.length) html += `<div class="shop-section-title">🟡 Stock faible (${faible.length})</div>` + faible.map(i => card(i,'faible')).join('');
+  if (ok.length)     html += `<div class="shop-section-title">🟢 En stock (${ok.length})</div>`     + ok.map(i => card(i,'ok')).join('');
+  document.getElementById('shopContent').innerHTML = html;
+}
 
-  function openModal(id) {
-    editingId = id || null;
-    buildQuickColors();
-    const spool = id ? spools.find(s => s.id === id) : null;
-    document.getElementById('modalTitle').textContent = spool ? '✏️ Modifier' : '➕ Nouvelle bobine';
-    document.getElementById('fColor').value = spool?.color || '';
-    document.getElementById('fBrand').value = spool?.brand || '';
-    document.getElementById('fType').value = spool?.type || 'PLA';
-    document.getElementById('fNotes').value = spool?.notes || '';
-    document.getElementById('fRemaining').value = spool?.remaining ?? 100;
-    document.getElementById('remainingVal').textContent = spool?.remaining ?? 100;
-    document.getElementById('fQty').value = 1;
-    document.getElementById('qtyField').style.display = spool ? 'none' : 'block';
-    document.getElementById('btnDelete').classList.toggle('hidden', !spool);
-    document.getElementById('btnSave').textContent = spool ? '💾 Sauvegarder' : 'Ajouter';
-    setHex(spool?.colorHex || '#888888');
-    setStatus(spool?.status || 'neuve');
-    document.getElementById('modalSheet').scrollTop = 0;
-    document.getElementById('overlay').classList.add('open');
-  }
+function render() { renderStats(); if (currentFilter === 'achats') renderShop(); else renderGrid(); }
 
-  function closeModal() {
-    document.getElementById('overlay').classList.remove('open');
-    editingId = null;
-  }
-
-  function saveSpool() {
-    const color = document.getElementById('fColor').value.trim();
-    if (!color) { document.getElementById('fColor').focus(); return; }
-    const data = {
-      color, colorHex: currentHex,
-      brand: document.getElementById('fBrand').value.trim(),
-      type: document.getElementById('fType').value,
-      status: currentStatus,
-      remaining: Number(document.getElementById('fRemaining').value),
-      notes: document.getElementById('fNotes').value.trim(),
-    };
-    if (editingId) {
-      spools = spools.map(s => s.id === editingId ? { ...data, id: editingId } : s);
+// ── FILTERS ──
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentFilter = btn.dataset.filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (currentFilter === 'achats') {
+      document.getElementById('grid').style.display = 'none';
+      document.getElementById('shopView').classList.add('active');
+      renderShop();
     } else {
-      const qty = Math.max(1, parseInt(document.getElementById('fQty').value) || 1);
-      for (let i = 0; i < qty; i++) spools.push({ ...data, id: Date.now() + '_' + i });
+      document.getElementById('grid').style.display = 'grid';
+      document.getElementById('shopView').classList.remove('active');
+      renderGrid();
     }
-    saveData(); closeModal(); render();
-  }
-
-  function deleteSpool() {
-    if (!confirm('Supprimer cette bobine ?')) return;
-    spools = spools.filter(s => s.id !== editingId);
-    saveData(); closeModal(); render();
-  }
-
-  document.getElementById('fabBtn').addEventListener('click', () => openModal(null));
-  document.getElementById('btnCancel').addEventListener('click', closeModal);
-  document.getElementById('btnSave').addEventListener('click', saveSpool);
-  document.getElementById('btnDelete').addEventListener('click', deleteSpool);
-  document.getElementById('btnNeuve').addEventListener('click', () => setStatus('neuve'));
-  document.getElementById('btnUsed').addEventListener('click', () => setStatus('utilisée'));
-  document.getElementById('fColorPicker').addEventListener('input', function() { setHex(this.value); });
-  document.getElementById('fColorHex').addEventListener('input', function() {
-    if (/^#[0-9a-fA-F]{6}$/.test(this.value)) setHex(this.value);
+    renderStats();
   });
-  document.getElementById('fRemaining').addEventListener('input', function() {
-    document.getElementById('remainingVal').textContent = this.value;
-  });
-  document.getElementById('overlay').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
+});
 
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+// ── MODAL ──
+function buildQuickColors() {
+  const c = document.getElementById('quickColors');
+  c.innerHTML = '';
+  QUICK.forEach(hex => {
+    const el = document.createElement('div');
+    el.className = 'qc';
+    el.style.background = hex;
+    el.dataset.hex = hex;
+    el.addEventListener('click', () => setHex(hex));
+    c.appendChild(el);
+  });
+}
+
+function setHex(hex) {
+  currentHex = hex;
+  document.getElementById('fColorPicker').value = hex;
+  document.getElementById('fColorHex').value = hex;
+  document.getElementById('colorPreview').style.background = hex;
+  document.querySelectorAll('.qc').forEach(el => el.classList.toggle('selected', el.dataset.hex === hex));
+}
+
+function setStatus(s) {
+  currentStatus = s;
+  document.getElementById('btnNeuve').classList.toggle('active', s === 'neuve');
+  document.getElementById('btnUsed').classList.toggle('active', s === 'utilisée');
+}
+
+function openModal(id) {
+  editingId = id || null;
+  buildQuickColors();
+  const s = id ? spools.find(x => x.id === id) : null;
+  document.getElementById('modalTitle').textContent = s ? '✏️ Modifier' : '➕ Nouvelle bobine';
+  document.getElementById('fColor').value    = s?.color    || '';
+  document.getElementById('fBrand').value    = s?.brand    || '';
+  document.getElementById('fType').value     = s?.type     || 'PLA';
+  document.getElementById('fNotes').value    = s?.notes    || '';
+  document.getElementById('fRemaining').value = s?.remaining ?? 100;
+  document.getElementById('remainingVal').textContent = s?.remaining ?? 100;
+  document.getElementById('fQty').value = 1;
+  document.getElementById('qtyField').style.display = s ? 'none' : 'block';
+  document.getElementById('btnDelete').classList.toggle('hidden', !s);
+  document.getElementById('btnSave').textContent = s ? '💾 Sauvegarder' : 'Ajouter';
+  setHex(s?.colorHex || '#888888');
+  setStatus(s?.status || 'neuve');
+  document.getElementById('modalSheet').scrollTop = 0;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  editingId = null;
+}
+
+function saveSpool() {
+  const color = document.getElementById('fColor').value.trim();
+  if (!color) { document.getElementById('fColor').focus(); return; }
+  const data = {
+    color, colorHex: currentHex,
+    brand: document.getElementById('fBrand').value.trim(),
+    type:  document.getElementById('fType').value,
+    status: currentStatus,
+    remaining: Number(document.getElementById('fRemaining').value),
+    notes: document.getElementById('fNotes').value.trim(),
+  };
+  if (editingId) {
+    spools = spools.map(s => s.id === editingId ? {...data, id: editingId} : s);
+  } else {
+    const qty = Math.max(1, parseInt(document.getElementById('fQty').value) || 1);
+    for (let i = 0; i < qty; i++) spools.push({...data, id: String(Date.now()) + '_' + i});
   }
+  saveData(); closeModal(); render();
+}
 
-  render();
+function deleteSpool() {
+  if (!confirm('Supprimer cette bobine ?')) return;
+  spools = spools.filter(s => s.id !== editingId);
+  saveData(); closeModal(); render();
+}
+
+// ── EVENTS ──
+document.getElementById('fabBtn').addEventListener('click', () => openModal(null));
+document.getElementById('btnCancel').addEventListener('click', closeModal);
+document.getElementById('btnSave').addEventListener('click', saveSpool);
+document.getElementById('btnDelete').addEventListener('click', deleteSpool);
+document.getElementById('btnNeuve').addEventListener('click', () => setStatus('neuve'));
+document.getElementById('btnUsed').addEventListener('click', () => setStatus('utilisée'));
+document.getElementById('fColorPicker').addEventListener('input', function() { setHex(this.value); });
+document.getElementById('fColorHex').addEventListener('input', function() {
+  if (/^#[0-9a-fA-F]{6}$/.test(this.value)) setHex(this.value);
+});
+document.getElementById('fRemaining').addEventListener('input', function() {
+  document.getElementById('remainingVal').textContent = this.value;
+});
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Désactive le service worker (source de bugs de cache)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+}
+
+render();
 </script>
 </body>
 </html>
