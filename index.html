@@ -283,7 +283,17 @@
     '#FF8A65','#4DB6AC','#7986CB','#F48FB1','#FFF176','#BCAAA4',
   ];
 
-  let spools = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  // Migrate old data from previous versions
+  function loadData() {
+    const v3 = localStorage.getItem('filaments-v3');
+    if (v3) return JSON.parse(v3);
+    const v2 = localStorage.getItem('filaments-v2');
+    if (v2) { localStorage.setItem('filaments-v3', v2); return JSON.parse(v2); }
+    const v1 = localStorage.getItem('filaments-v1');
+    if (v1) { localStorage.setItem('filaments-v3', v1); return JSON.parse(v1); }
+    return [];
+  }
+  let spools = loadData();
   let filter = 'tout';
   let editingId = null;
   let currentHex = '#888888';
